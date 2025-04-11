@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiacal Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            dark: '#0f2a47',
+                            DEFAULT: '#1a3a64',
+                            light: '#2c4f80'
+                        },
+                        secondary: {
+                            DEFAULT: '#5D5CDE',
+                        },
+                        darkBg: '#181818',
+                    },
+                    boxShadow: {
+                        'calc': '0 4px 15px rgba(0, 0, 0, 0.15)',
+                        'btn': '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        .calc-btn {
+            transition: all 0.1s ease;
+        }
+        .calc-btn:active {
+            transform: scale(0.96);
+        }
+        .dark .calc-display {
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        .calc-display {
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-darkBg min-h-screen flex items-center justify-center p-4 transition-colors duration-200">
+    <div class="max-w-sm w-full">
+        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-calc p-5 overflow-hidden">
+            <!-- Calculator Header -->
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold text-primary dark:text-white">Fiacal</h1>
+                <div class="text-xs text-gray-400">Scientific Calculator</div>
+            </div>
+            
+            <!-- Calculator Display -->
+            <div class="calc-display bg-gray-100 dark:bg-gray-900 rounded-xl p-4 mb-5">
+                <div id="expression" class="text-right text-gray-500 dark:text-gray-400 text-sm font-mono mb-1 h-6 overflow-hidden"></div>
+                <div id="display" class="text-right text-3xl font-semibold text-primary-dark dark:text-white font-mono overflow-x-auto whitespace-nowrap">0</div>
+            </div>
+            
+            <!-- Calculator Buttons -->
+            <div class="grid grid-cols-4 gap-3">
+                <!-- Row 1 -->
+                <button class="calc-btn bg-red-500 text-white p-3 rounded-xl hover:bg-red-600 shadow-btn" data-action="clear">AC</button>
+                <button class="calc-btn bg-primary-light text-white p-3 rounded-xl hover:bg-primary shadow-btn" data-action="sqrt">√</button>
+                <button class="calc-btn bg-primary-light text-white p-3 rounded-xl hover:bg-primary shadow-btn" data-action="power">x²</button>
+                <button class="calc-btn bg-primary text-white p-3 rounded-xl hover:bg-primary-dark shadow-btn" data-action="divide">÷</button>
+
+                <!-- Row 2 -->
+                <button class="calc-btn bg-gray-200 dark:bg-gray-700 p-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white shadow-btn" data-value="7">7</button>
+                <button class="calc-btn bg-gray-200 dark:bg-gray-700 p-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white shadow-btn" data-value="8">8</button>
+                <button class="calc-btn bg-gray-200 dark:bg-gray-700 p-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white shadow-btn" data-value="9">9</button>
+                <button class="calc-btn bg-primary text-white p-3 rounded-xl hover:bg-primary-dark shadow-btn" data-action="multiply">×</button>
+
+                <!-- Row 3 -->
+                <button class="calc-btn bg-gray-200 dark:bg-gray-700 p-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white shadow-btn" data-value="4">4</button>
+                <button class="calc-btn bg-gray-200 dark:bg-gray-700 p-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white shadow-btn" data-value="5">5</button>
+                <button class="calc-btn bg-gray-200 dark:bg-gray-700 p-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white shadow-btn" data-value="6">6</button>
+                <button class="calc-btn bg-primary text-white p-3 rounded-xl hover:bg-primary-dark shadow-btn" data-action="subtract">-</button>
+
+                <!-- Row 4 -->
+                <button class="calc-btn bg-gray-200 dark:bg-gray-700 p-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white shadow-btn" data-value="1">1</button>
+                <button class="calc-btn bg-gray-200 dark:bg-gray-700 p-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white shadow-btn" data-value="2">2</button>
+                <button class="calc-btn bg-gray-200 dark:bg-gray-700 p-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white shadow-btn" data-value="3">3</button>
+                <button class="calc-btn bg-primary text-white p-3 rounded-xl hover:bg-primary-dark shadow-btn" data-action="add">+</button>
+
+                <!-- Row 5 -->
+                <button class="calc-btn bg-primary-light text-white p-3 rounded-xl hover:bg-primary shadow-btn" data-action="percent">%</button>
+                <button class="calc-btn bg-gray-200 dark:bg-gray-700 p-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white shadow-btn" data-value="0">0</button>
+                <button class="calc-btn bg-gray-200 dark:bg-gray-700 p-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-white shadow-btn" data-value=".">.</button>
+                <button class="calc-btn bg-secondary text-white p-3 rounded-xl hover:bg-indigo-500 shadow-btn" data-action="calculate">=</button>
+            </div>
+            
+            <!-- Additional Functions -->
+            <div class="grid grid-cols-4 gap-3 mt-3">
+                <button class="calc-btn bg-primary-light text-white p-3 rounded-xl hover:bg-primary shadow-btn" data-action="sin">sin</button>
+                <button class="calc-btn bg-primary-light text-white p-3 rounded-xl hover:bg-primary shadow-btn" data-action="cos">cos</button>
+                <button class="calc-btn bg-primary-light text-white p-3 rounded-xl hover:bg-primary shadow-btn" data-action="tan">tan</button>
+                <button class="calc-btn bg-primary-light text-white p-3 rounded-xl hover:bg-primary shadow-btn" data-action="backspace">⌫</button>
+            </div>
+        </div>
+        <div class="text-center mt-4 text-gray-500 dark:text-gray-400 text-xs">Fiacal © 2023 - Modern Calculator</div>
+    </div>
+
+    <script>
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Calculator logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const display = document.getElementById('display');
+            const expressionDisplay = document.getElementById('expression');
+            let currentValue = '0';
+            let currentExpression = '';
+            let lastOperation = null;
+            let lastResult = null;
+            let waitingForOperand = false;
+            
+            // Update display
+            function updateDisplay() {
+                display.textContent = currentValue;
+                expressionDisplay.textContent = currentExpression;
+            }
+            
+            // Clear calculator
+            function clearCalculator() {
+                currentValue = '0';
+                currentExpression = '';
+                lastOperation = null;
+                lastResult = null;
+                waitingForOperand = false;
+                updateDisplay();
+            }
+            
+            // Handle number input
+            function inputDigit(digit) {
+                if (waitingForOperand) {
+                    currentValue = digit;
+                    waitingForOperand = false;
+                } else {
+                    currentValue = currentValue === '0' ? digit : currentValue + digit;
+                }
+                updateDisplay();
+            }
+            
+            // Handle decimal point
+            function inputDecimal() {
+                if (waitingForOperand) {
+                    currentValue = '0.';
+                    waitingForOperand = false;
+                } else if (currentValue.indexOf('.') === -1) {
+                    currentValue += '.';
+                }
+                updateDisplay();
+            }
+            
+            // Handle operators
+            function handleOperator(operator) {
+                const inputValue = parseFloat(currentValue);
+                
+                if (lastResult === null) {
+                    lastResult = inputValue;
+                } else if (lastOperation) {
+                    const result = performCalculation(lastOperation, lastResult, inputValue);
+                    lastResult = result;
+                    currentValue = String(result);
+                }
+                
+                waitingForOperand = true;
+                lastOperation = operator;
+                
+                switch(operator) {
+                    case 'add': 
+                        currentExpression = `${lastResult} + `; 
+                        break;
+                    case 'subtract': 
+                        currentExpression = `${lastResult} - `; 
+                        break;
+                    case 'multiply': 
+                        currentExpression = `${lastResult} × `; 
+                        break;
+                    case 'divide': 
+                        currentExpression = `${lastResult} ÷ `; 
+                        break;
+                }
+                
+                updateDisplay();
+            }
+            
+            // Perform calculation
+            function performCalculation(operation, firstNum, secondNum) {
+                switch(operation) {
+                    case 'add':
+                        return firstNum + secondNum;
+                    case 'subtract':
+                        return firstNum - secondNum;
+                    case 'multiply':
+                        return firstNum * secondNum;
+                    case 'divide':
+                        return firstNum / secondNum;
+                    default:
+                        return secondNum;
+                }
+            }
+            
+            // Calculate result
+            function calculateResult() {
+                const inputValue = parseFloat(currentValue);
+                
+                if (lastOperation) {
+                    currentExpression += inputValue;
+                    const result = performCalculation(lastOperation, lastResult, inputValue);
+                    currentValue = String(result);
+                    currentExpression += ` = ${result}`;
+                    lastResult = result;
+                } else {
+                    currentExpression = `${inputValue} = ${inputValue}`;
+                }
+                
+                waitingForOperand = true;
+                lastOperation = null;
+                updateDisplay();
+            }
+            
+            // Handle special operations
+            function handleSpecialOperation(operation) {
+                const inputValue = parseFloat(currentValue);
+                let result;
+                
+                switch(operation) {
+                    case 'sqrt':
+                        result = Math.sqrt(inputValue);
+                        currentExpression = `√(${inputValue}) = ${result}`;
+                        break;
+                    case 'power':
+                        result = Math.pow(inputValue, 2);
+                        currentExpression = `${inputValue}² = ${result}`;
+                        break;
+                    case 'percent':
+                        result = inputValue / 100;
+                        currentExpression = `${inputValue}% = ${result}`;
+                        break;
+                    case 'sin':
+                        result = Math.sin(inputValue * Math.PI / 180);
+                        currentExpression = `sin(${inputValue}°) = ${result}`;
+                        break;
+                    case 'cos':
+                        result = Math.cos(inputValue * Math.PI / 180);
+                        currentExpression = `cos(${inputValue}°) = ${result}`;
+                        break;
+                    case 'tan':
+                        result = Math.tan(inputValue * Math.PI / 180);
+                        currentExpression = `tan(${inputValue}°) = ${result}`;
+                        break;
+                }
+                
+                currentValue = String(result);
+                waitingForOperand = true;
+                lastResult = result;
+                lastOperation = null;
+                updateDisplay();
+            }
+            
+            // Handle backspace
+            function handleBackspace() {
+                if (currentValue.length > 1) {
+                    currentValue = currentValue.slice(0, -1);
+                } else {
+                    currentValue = '0';
+                }
+                updateDisplay();
+            }
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.calc-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (button.hasAttribute('data-value')) {
+                        const value = button.getAttribute('data-value');
+                        if (value === '.') {
+                            inputDecimal();
+                        } else {
+                            inputDigit(value);
+                        }
+                    } else if (button.hasAttribute('data-action')) {
+                        const action = button.getAttribute('data-action');
+                        
+                        switch(action) {
+                            case 'clear':
+                                clearCalculator();
+                                break;
+                            case 'calculate':
+                                calculateResult();
+                                break;
+                            case 'backspace':
+                                handleBackspace();
+                                break;
+                            case 'add':
+                            case 'subtract':
+                            case 'multiply':
+                            case 'divide':
+                                handleOperator(action);
+                                break;
+                            case 'sqrt':
+                            case 'power':
+                            case 'percent':
+                            case 'sin':
+                            case 'cos':
+                            case 'tan':
+                                handleSpecialOperation(action);
+                                break;
+                        }
+                    }
+                });
+            });
+            
+            // Keyboard support
+            document.addEventListener('keydown', event => {
+                const key = event.key;
+                
+                // Number keys
+                if (/^[0-9]$/.test(key)) {
+                    event.preventDefault();
+                    inputDigit(key);
+                } else if (key === '.') {
+                    event.preventDefault();
+                    inputDecimal();
+                } else if (key === '+') {
+                    event.preventDefault();
+                    handleOperator('add');
+                } else if (key === '-') {
+                    event.preventDefault();
+                    handleOperator('subtract');
+                } else if (key === '*') {
+                    event.preventDefault();
+                    handleOperator('multiply');
+                } else if (key === '/') {
+                    event.preventDefault();
+                    handleOperator('divide');
+                } else if (key === '=' || key === 'Enter') {
+                    event.preventDefault();
+                    calculateResult();
+                } else if (key === 'Escape') {
+                    event.preventDefault();
+                    clearCalculator();
+                } else if (key === 'Backspace') {
+                    event.preventDefault();
+                    handleBackspace();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
